@@ -1,70 +1,129 @@
-# Getting Started with Create React App
+# Filtering array of objects in react
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+https://contactmentor.com/reactjs-filter-array-of-objects/
 
-## Available Scripts
+1. Display all cars with details
+2. Filter car list by year
+3. Filter car list by maker from dropdown
 
-In the project directory, you can run:
+```jsx
+// List of all cars satisfing all the filters
+const [filteredList, setFilteredList] = useState(carList);
 
-### `npm start`
+// Selected Brand name filter
+const [selectedBrand, setSelectedBrand] = useState("");
+// Selected Year filter
+const [selectedYear, setSelectedYear] = useState();
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+4. Know what properties we have
+   Every car has following properties: name, url, release_year
+   {
+   name : "BMW M6",
+   url : "https://www.bmw.com/en/all-models/m6/",
+   release_year : "2016"
+   }
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+5. Declaring state for filter values
 
-### `npm test`
+filteredList : state for list of all cars that satisfy all filter conditions
+selectedBrand : state for the brand_name value based on which filteredList state has to be filtered
+selectedYear : state for the year which is used to filter car objects based on relase_year property
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+3. Display the list of items on the screen
+   apply Array.map() on filteredList React state to add details of every entry to JSX code
 
-### `npm run build`
+The filteredList state initially contains the list of all the elements.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```jsx
+    return (
+        <div>
+            {filteredList.map((car,index) => (
+                    <li key={index}>
+                        <a href={car.url}>{car.name}</a>
+                        <span>{car.release_year}</span>
+                    </li>
+            ))}
+        </div>
+    );
+    )
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+4. Filter items by brand name
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Avoid filtering array when selectedBrand = "";
+Filter filtedData array to include only car names with selectedBrand word.
+return filteredData array
 
-### `npm run eject`
+```jsx
+const filteredByBrand = (filteredData) => {
+  // Avoid filter for empty string
+  if (!selectedBrand) {
+    return filteredData;
+  }
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+  const filteredCars = filteredData.filter(
+    (car) => car.name.split(" ").indexOf(selectedBrand) !== -1
+  );
+  return filteredCars;
+};
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+5. Filter items by year
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Avoid filtering array when selectedYear == null
+Filter array to include all the car objects where release_year property matches selectedYear
+return filteredData array
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```jsx
+const filterByYear = (filteredData) => {
+  if (!selectedYear) {
+    return filteredData;
+  }
 
-## Learn More
+  const filteredCars = filteredData.filter(
+    (car) => car.release_year === selectedYear
+  );
+  return filteredCars;
+};
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+6. Functions to handle filter change
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Following functions to handle changes in filter values.
 
-### Code Splitting
+1. handleBrandChange : update selectedBrand state based on event target value
+2. handleYearChange : Reset selectedYear if same year is selected, else selectedYear is updated with inputYear
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+```jsx
+// Update selectedBrand state
+const handleBrandChange = (event) => {
+  setSelectedBrand(event.target.value);
+};
 
-### Analyzing the Bundle Size
+// Toggle selectedYear state
+const handleYearChange = (event) => {
+  const inputYear = Number(event.target.id);
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+  if (inputYear === selectedYear) {
+    setSelectedYear("");
+  } else {
+    setSelectedYear(inputYear);
+  }
+};
+```
 
-### Making a Progressive Web App
+7. Add HTML for filters
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+Apply the jsx code
 
-### Advanced Configuration
+8. React Hooks to trigger update of filtered values
+   The handle filter functions only update the selectedBrand and selectedYear states, but filteredByBrand and filterByYear JS functions are not triggered
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```jsx
+useEffect(() => {
+  let filteredData = filtereByBrand(carList);
+  filtedData = filterByYear(filteredData);
+  setFilteredList(filteredData);
+}, [selectedBrand, selectedYear]);
+```
