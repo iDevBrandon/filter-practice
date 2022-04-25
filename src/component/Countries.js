@@ -48,12 +48,16 @@ function Countries() {
   } else {
     return (
       <div className="wrapper">
-        <Filter searchCountries={searchCountries} searchInput={searchInput} />
+        <Filter
+          searchCountries={searchCountries}
+          searchInput={searchInput}
+          setCountries={setCountries}
+        />
 
         {searchInput.length > 0 ? (
           <ul className="card-grid">
-            {filtered.map((item) => (
-              <li>
+            {filtered.map((item, index) => (
+              <li key={index}>
                 <article className="card" key={item.callingCodes}>
                   <div className="card-image">
                     <img src={item.flag} alt={item.name.common} />
@@ -77,9 +81,9 @@ function Countries() {
             ))}
           </ul>
         ) : (
-          <ul className="card-grid">
-            {countries.map((item) => (
-              <li>
+          <>
+            {countries.map((item, index) => (
+              <li key={index}>
                 <article className="card" key={item.callingCodes}>
                   <div className="card-image">
                     <img src={item.flag} alt={item.name.common} />
@@ -101,7 +105,7 @@ function Countries() {
                 </article>
               </li>
             ))}
-          </ul>
+          </>
         )}
       </div>
     );
